@@ -19,6 +19,7 @@ out/:
 	mkdir out
 
 test: all $(TEST_EXEC)
+	./$(TEST_EXEC)
 
 $(TEST_EXEC): $(MODULES) $(TEST_MODULES)
 	$(COMPILER) -o $@ $^
