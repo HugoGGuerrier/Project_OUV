@@ -1,7 +1,7 @@
 (* ----- Exercice 1 ----- *)
 
 (* Q1.1 : Choisit aléatoirement un élément de l et le déplace en tête de p : O(n), n taille de l *)
-let extraction_alea l p = 
+let extraction_alea (l:'a list) (p:'a list) : 'a list * 'a list = 
   let len = List.length l in
   if len = 0 then (l, p)
   else (
@@ -15,14 +15,14 @@ let extraction_alea l p =
 
 
 (* Q1.2 : Génère une liste d'entiers de 1 à n aléatoirement placés dans une liste (shuffle de Fisher-Yates) : O(n^2) *)
-let gen_permutation n =
+let gen_permutation (n:int) : int list =
 
   (* Fonction pour générer la liste d'entier de 1 à n de manière récursive : O(n) *)
-  let rec gen_liste lst courrant n = 
-    if courrant > n then
+  let rec gen_liste lst courant n = 
+    if courant > n then
       List.rev lst
     else
-      gen_liste (courrant :: lst) (courrant + 1) n
+      gen_liste (courant :: lst) (courant + 1) n
   in
 
   (* Fonction pour insérer les éléments de src dans dst dans un ordre aléatoire : O(n^2), n taille de src *)
