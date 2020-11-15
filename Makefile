@@ -7,12 +7,18 @@ TEST_EXEC=bin/tests
 TEST_MODULES=out/tests.cmx
 TEST_SOURCES=src/tests.ml
 
-all: $(MODULES)
-
-test: all $(TEST_EXEC)
+all: bin/ out/ $(MODULES)
 
 $(MODULES): $(SOURCES)
 	$(COMPILER) -I out/ -c $^ -o $@
+
+bin/:
+	mkdir bin
+
+out/:
+	mkdir out
+
+test: all $(TEST_EXEC)
 
 $(TEST_EXEC): $(MODULES) $(TEST_MODULES)
 	$(COMPILER) -o $@ $^
