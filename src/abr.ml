@@ -44,6 +44,33 @@ let gen_permutation (n: int) : int list =
     melange liste_base []
 
 
+(* --- Exercice 2 *)
+
+(*** Q1.4 *)
+let intercale (l1: 'a list) (l2: 'a list) : 'a list =
+  let rec intercale_rec l1 l2 n1 n2 =
+    match (l1, l2) with
+    | ([], _) -> l2
+    | (_, []) -> l1
+    | (h1 :: t1, h2 :: t2) -> 
+      let rand = Random.int (n1 + n2) in
+      if (rand < n1) then
+        h1::(intercale_rec t1 l2 (n1 - 1) n2)
+      else
+        h2::(intercale_rec l1 t2 n1 (n2 - 1))
+  in
+  intercale_rec l1 l2 (List.length l1) (List.length l2)
+
+
+(*** Q1.5 *)
+let rec gen_permutation2 (p: int) (q: int) : int list =
+  if p > q then []
+  else if p = q then [p]
+  else
+    let moitie = (p + q) / 2 in
+    intercale (gen_permutation2 p moitie) (gen_permutation2 (moitie + 1) q)
+
+
 (* --- Exercice 3 *)
 
 (* Q1.7 : Création d'un ABR à partier d'une liste d'entiers *)
