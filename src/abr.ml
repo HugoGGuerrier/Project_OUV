@@ -80,7 +80,7 @@ let creer_abr lst =
     match lst with
     | [] -> arbre
     | h :: t -> 
-      let nouv_noeud = {label = h ; gauche = Feuille ; droite = Feuille} in
+      let nouv_noeud = Noeud {label = h ; gauche = Feuille ; droite = Feuille} in
       parcourir_liste t (inserer_abr nouv_noeud arbre)
   in
 
