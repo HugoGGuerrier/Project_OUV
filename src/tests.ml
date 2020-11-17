@@ -107,6 +107,14 @@ let test_intercale () =
   ()
 
 
+let test_creer_abr () = 
+  assert (creer_abr [] = Feuille) ;
+  assert (creer_abr [1] = a1_n1) ;
+  assert (creer_abr [4;2;3;8;1;9;6;7;5] = a1) ;
+  assert (creer_abr [4;2;1;8;3;9;6;7;5] = a1) ;
+  ()
+
+
 let test_str_struct_abr () =
   let str = str_struct_abr a1 in
   print_newline () ;
@@ -138,8 +146,9 @@ let run_tests () =
       ("Q1.1 - Extraction aléatoire dans une liste", test_extraction_alea) ;
       ("Q1.2 - Génération d'une liste avec l’algorithme de shuffle de Fisher-Yates", test_gen_permutation) ;
       ("Q1.4 - Assemblage de deux listes en les intercallant aléatoirement", test_intercale) ;
+      ("Q1.7 - Génération d'un ABR à partir d'une liste d'entiers", test_creer_abr) ;
       ("Q2.8 - Génération d'une chaine de caractères correspondant à la structure de l'ABR", test_str_struct_abr) ;
-      ("Q2.9 - Génération du tableau d'un arbre lu en ordre préfixe", test_prefixe)
+      ("Q2.9 - Génération du tableau de l'ABR lu en ordre préfixe", test_prefixe)
     ]
   in
   List.iteri

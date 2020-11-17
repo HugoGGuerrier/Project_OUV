@@ -112,7 +112,6 @@ let creer_abr lst =
       let nouv_noeud = Noeud {label = h ; gauche = Feuille ; droite = Feuille} in
       parcourir_liste t (inserer_abr nouv_noeud arbre)
   in
-
   parcourir_liste lst Feuille
 
 
