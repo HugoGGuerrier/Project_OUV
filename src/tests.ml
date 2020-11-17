@@ -1,5 +1,22 @@
 open Abr
 
+(* a1 : Arbre de la question 1.7 du sujet *)
+    let a1_n1 = Noeud {label = 1 ; gauche = Feuille ; droite = Feuille} ;;
+    let a1_n3 = Noeud {label = 3 ; gauche = Feuille ; droite = Feuille} ;;
+  let a1_n2 = Noeud {label = 2 ; gauche = a1_n1 ; droite = a1_n3} ;;
+      let a1_n5 = Noeud {label = 5 ; gauche = Feuille ; droite = Feuille} ;;
+      let a1_n7 = Noeud {label = 7 ; gauche = Feuille ; droite = Feuille} ;;
+    let a1_n6 = Noeud {label = 6 ; gauche = a1_n5 ; droite = a1_n7} ;;
+    let a1_n9 = Noeud {label = 9 ; gauche = Feuille ; droite = Feuille} ;;
+  let a1_n8 = Noeud {label = 8 ; gauche = a1_n6 ; droite = a1_n9} ;;
+let a1_n4 = Noeud {label = 4 ; gauche = a1_n2 ; droite = a1_n8} ;;
+
+let a1 = a1_n4 ;;
+
+let a1_str = "((())())((())())()" ;;
+
+let a1_prefixe = [|4;2;1;3;8;6;5;7;9|] ;;
+
 
 let test_extraction_alea () = 
   (* listes l et p banales *)
@@ -55,7 +72,6 @@ let test_gen_permutation () =
   ()
 
 
-
 let test_intercale () =
   let l0 = []
   and l1 = [0]
@@ -91,13 +107,39 @@ let test_intercale () =
   ()
 
 
+let test_str_struct_abr () =
+  let str = str_struct_abr a1 in
+  print_newline () ;
+  print_string str ;
+  print_newline () ;
+  assert (str = a1_str) ;
+  assert (str_struct_abr Feuille = "") ;
+  assert (str_struct_abr a1_n1 = "()" ) ;
+  assert (str_struct_abr a1_n2 = "(())()" ) ;
+  ()
+
+
+let test_prefixe () =
+  let pref = prefixe a1 in
+  assert (pref = a1_prefixe) ;
+  assert (prefixe Feuille = Array.make 0 0) ;
+  assert (prefixe a1_n2 = [|2;1;3|]) ;
+  assert (prefixe a1_n1 = [|1|]) ;
+  assert (prefixe a1_n3 = [|3|]) ;
+  assert (prefixe a1_n8 = [|8;6;5;7;9|]) ;
+  assert (prefixe a1_n6 = [|6;5;7|]) ;
+  assert (prefixe a1_n9 = [|9|]) ;
+  ()
+
 (** Lancement et formatage des tests *)
 
 let run_tests () =
   let liste_tests = [
-      ("Q1.1 - Extraction aléatoire dans une liste", test_extraction_alea);
-      ("Q1.2 - Génération d'une liste avec l’algorithme de shuffle de Fisher-Yates", test_gen_permutation);
-      ("Q1.4 - Assemblage de deux listes en les intercallant aléatoirement", test_intercale)
+      ("Q1.1 - Extraction aléatoire dans une liste", test_extraction_alea) ;
+      ("Q1.2 - Génération d'une liste avec l’algorithme de shuffle de Fisher-Yates", test_gen_permutation) ;
+      ("Q1.4 - Assemblage de deux listes en les intercallant aléatoirement", test_intercale) ;
+      ("Q2.8 - Génération d'une chaine de caractères correspondant à la structure de l'ABR", test_str_struct_abr) ;
+      ("Q2.9 - Génération du tableau d'un arbre lu en ordre préfixe", test_prefixe)
     ]
   in
   List.iteri

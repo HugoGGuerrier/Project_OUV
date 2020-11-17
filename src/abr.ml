@@ -1,9 +1,11 @@
+(* -------------------- *)
 (* ----- Partie 1 ----- *)
+(* -------------------- *)
 
 
-(* --- Exercice 1 *)
+(* --- Exercice 1.1 *)
 
-(* Q1.1 : Choisit aléatoirement un élément de l et le déplace en tête de p : O(n), n taille de l *)
+(*** Q1.1 : Choisit aléatoirement un élément de l et le déplace en tête de p : O(n), n taille de l *)
 let extraction_alea (l: 'a list) (p: 'a list) : 'a list * 'a list = 
   let len = List.length l in
   if len = 0 then (l, p)
@@ -17,7 +19,7 @@ let extraction_alea (l: 'a list) (p: 'a list) : 'a list * 'a list =
   )
 
 
-(* Q1.2 : Génère une liste d'entiers de 1 à n aléatoirement placés dans une liste (shuffle de Fisher-Yates) : O(n^2) *)
+(*** Q1.2 : Génère une liste d'entiers de 1 à n aléatoirement placés dans une liste (shuffle de Fisher-Yates) : O(n^2) *)
 let gen_permutation (n: int) : int list =
 
   (* Fonction pour générer la liste d'entier de 1 à n de manière récursive : O(n) *)
@@ -44,7 +46,7 @@ let gen_permutation (n: int) : int list =
     melange liste_base []
 
 
-(* --- Exercice 2 *)
+(* --- Exercice 1.2 *)
 
 (*** Q1.4 *)
 let intercale (l1: 'a list) (l2: 'a list) : 'a list =
@@ -71,24 +73,24 @@ let rec gen_permutation2 (p: int) (q: int) : int list =
     intercale (gen_permutation2 p moitie) (gen_permutation2 (moitie + 1) q)
 
 
-(* --- Exercice 3 *)
+(* --- Exercice 1.3 *)
 
-(* Q1.7 : Création d'un ABR à partier d'une liste d'entiers *)
+(*** Q1.7 : Création d'un ABR à partier d'une liste d'entiers *)
 
 (* Définition du type pour construire un ABR *)
-type noeud_ABR = 
+type abr = 
   | Feuille
-  | Noeud of non_vide
+  | Noeud of contenu
 
-and non_vide = {
+and contenu = {
   label : int ;
-  gauche : noeud_ABR ;
-  droite : noeud_ABR ;
+  gauche : abr ;
+  droite : abr ;
 }
 
 
 (* Fonction pour insérer un noeud dans un arbre binaire de recherche *)
-let rec inserer_abr (noeud: noeud_ABR) (arbre: noeud_ABR) : noeud_ABR = 
+let rec inserer_abr (noeud: abr) (arbre: abr) : abr = 
     match noeud with
     | Feuille -> arbre
     | Noeud nv ->
@@ -114,10 +116,37 @@ let creer_abr lst =
   parcourir_liste lst Feuille
 
 
-(* --- Fonctions utilitaires *)
+
+(* -------------------- *)
+(* ----- Partie 2 ----- *)
+(* -------------------- *)
+
+
+(*** Q2.8 : construction de la chaine de caractères liée à la structure de l'arbre (fonction "phi") *)
+let rec str_struct_abr (arbre: abr) : string =
+  match arbre with
+  | Feuille -> ""
+  | Noeud {label ; gauche ; droite} ->
+    "(" ^ (str_struct_abr gauche) ^ ")" ^ (str_struct_abr droite)
+
+
+(*** Q2.9 : construction d'un tableau des étiquettes de l'arbre rangées en ordre préfixe *)
+let prefixe (arbre: abr) : int array =
+  let rec prefixe_rec (arbre: abr) : int list =
+    match arbre with 
+    | Feuille -> []
+    | Noeud {label ; gauche ; droite} ->
+      label::(prefixe_rec gauche) @ (prefixe_rec droite)
+  in
+  Array.of_list (prefixe_rec arbre)
+
+
+(* ----------------------------- *)
+(* --- Fonctions utilitaires --- *)
+(* ----------------------------- *)
 
 (* Afficher un abr dans le terminal (uniquement utile pour le debug) *)
-let rec afficher_abr (arbre: noeud_ABR) : unit =
+let rec afficher_abr (arbre: abr) : unit =
   match arbre with
   | Feuille -> print_string "x" ; ()
   | Noeud {label ; gauche ; droite} ->
