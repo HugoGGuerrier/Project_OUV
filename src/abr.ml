@@ -103,7 +103,7 @@ let rec inserer_abr (noeud: abr) (arbre: abr) : abr =
 
 (* Fonction de construction d'un ABR à partir d'une liste d'entiers *)
 let creer_abr lst = 
-  let rec parcourir_liste lst arbre =
+  let rec parcourir_liste (lst: int list) (arbre: abr) : abr =
     match lst with
     | [] -> arbre
     | h :: t -> 
@@ -175,21 +175,71 @@ let rec chercher_structure (arbre: abr) (structure: string) : abr =
       | Feuille -> chercher_structure droite structure
       | result_gauche -> result_gauche
 
-(*** Fonction pour rechercher un noeud par label dans un ABR compressé (sans prendre en compte les poineurs) *)
+(*** Fonction pour rechercher un noeud par label dans un ABR compressé (sans prendre en compte les pointeurs) *)
 
 let rec chercher_label_comp (arbre: abr_comp) (lab: int) : abr_comp =
   match arbre with
   | Feuille_comp -> arbre
   | Pointeur_comp _ -> Feuille_comp
-  | Noeud_comp {taille ; label ; gauche ; droite} ->
-    if label = lab then
+  | Noeud_comp {taille_c = _ ; label_c = lc ; gauche_c = gc ; droite_c = dc} ->
+    if lc = lab then
       arbre
-    else
-      match chercher_label_comp gauche lab with
-      | Feuille_comp -> chercher_label_comp droite lab
-      | result_gauche -> result_gauche
+    else if lab > lc then 
+      chercher_label_comp dc lab 
+    else 
+      chercher_label_comp gc lab
+
+(*** Fonction pour insérer noaud dans un arbre compressé *)
+
+let rec inserer_abr_comp (noeud: abr_comp) (arbre: abr_comp) : abr_comp =
+  match noeud with
+  | Feuille_comp -> arbre
+
+  | Noeud_comp {taille_c = taille ; label_c = label ; gauche_c = gauche ; droite_c = droite} ->
+    (
+      match arbre with
+      | Feuille_comp -> noeud
+      | Pointeur_comp _ -> arbre
+      | Noeud_comp {taille_c = taille_a ; label_c = label_a ; gauche_c = gauche_a ; droite_c = droite_a} -> 
+        if label > label_a then
+          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = gauche_a ; droite_c = (inserer_abr_comp noeud droite_a)}
+        else
+          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = (inserer_abr_comp noeud gauche_a) ; droite_c = droite_a}
+    )
+
+  | Pointeur_comp {cible_c = cible ; labels_c = labels} ->
+    (
+      match arbre with
+      | Feuille_comp -> noeud
+      | Pointeur_comp _ -> arbre
+      | Noeud_comp {taille_c = taille_a ; label_c = label_a ; gauche_c = gauche_a ; droite_c = droite_a} -> 
+        if labels.(0) > label_a then
+          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = gauche_a ; droite_c = (inserer_abr_comp noeud droite_a)}
+        else
+          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = (inserer_abr_comp noeud gauche_a) ; droite_c = droite_a}
+    )
 
 (*** Fonction pour compresser un ABR :-) *)
+
+let compresser_abr (src: abr) : abr_comp = 
+  let rec parcourir_arbre (noeud: abr) (compresse: abr_comp) : abr_comp = 
+    match noeud with
+    | Feuille -> compresse
+    | Noeud n ->
+      let n_str = str_struct_abr noeud in
+      match chercher_structure src n_str with
+      | Noeud found ->
+        if found.label = n.label then
+          let new_comp = inserer_abr_comp (Noeud_comp {taille_c = 1 ; label_c = n.label ; gauche_c = Feuille_comp ; droite_c = Feuille_comp}) compresse in
+          parcourir_arbre n.droite (parcourir_arbre n.gauche new_comp)
+        else
+          let new_comp = inserer_abr_comp (Pointeur_comp {cible_c = (chercher_label_comp compresse found.label) ; labels_c = (prefixe noeud)}) compresse in
+          parcourir_arbre n.droite (parcourir_arbre n.gauche new_comp)
+      | Feuille _ -> Feuille_comp
+  in
+
+  parcourir_arbre src Feuille_comp
+
 
 (* TODOOOOOO *)
 
