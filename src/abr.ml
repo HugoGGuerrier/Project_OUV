@@ -241,8 +241,6 @@ let compresser_abr (src: abr) : abr_comp =
   parcourir_arbre src Feuille_comp
 
 
-(* TODOOOOOO *)
-
 let rec recherche_valeur_comp (arbre: abr_comp) (valeur: int) : bool =
   match arbre with 
   | Feuille_comp -> false
