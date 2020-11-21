@@ -117,9 +117,6 @@ let test_creer_abr () =
 
 let test_str_struct_abr () =
   let str = str_struct_abr a1 in
-  print_newline () ;
-  print_string str ;
-  print_newline () ;
   assert (str = a1_str) ;
   assert (str_struct_abr Feuille = "") ;
   assert (str_struct_abr a1_n1 = "()" ) ;
@@ -139,6 +136,15 @@ let test_prefixe () =
   assert (prefixe a1_n9 = [|9|]) ;
   ()
 
+let test_chercher_structure () = 
+  let res_a1_n6 = chercher_structure a1 (str_struct_abr a1_n6) in
+  let res_none = chercher_structure a1 "(()(((" in
+  let res_void_abr = chercher_structure Feuille "(()(" in
+  assert (res_a1_n6 = a1_n2) ;
+  assert (res_none = Feuille) ;
+  assert (res_void_abr = Feuille) ;
+  ()
+
 (** Lancement et formatage des tests *)
 
 let run_tests () =
@@ -148,12 +154,13 @@ let run_tests () =
       ("Q1.4 - Assemblage de deux listes en les intercallant aléatoirement", test_intercale) ;
       ("Q1.7 - Génération d'un ABR à partir d'une liste d'entiers", test_creer_abr) ;
       ("Q2.8 - Génération d'une chaine de caractères correspondant à la structure de l'ABR", test_str_struct_abr) ;
-      ("Q2.9 - Génération du tableau de l'ABR lu en ordre préfixe", test_prefixe)
+      ("Q2.9 - Génération du tableau de l'ABR lu en ordre préfixe", test_prefixe) ;
+      ("Q2.10 - Recherche d'une structure dans un arbre", test_chercher_structure) ;
     ]
   in
   List.iteri
     (fun i (nom_test, f_test) ->
-      Format.printf "--- Test #%d - %s:\t" (i + 1) nom_test ;
+      Format.printf "--- Test #%d - %s : " (i + 1) nom_test ;
       try
         f_test () ;
         Format.printf "\027[32mOK\n\027[39m"

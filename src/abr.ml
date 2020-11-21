@@ -3,9 +3,8 @@
 (* -------------------- *)
 
 
-(* --- Exercice 1.1 *)
-
 (*** Q1.1 : Choisit aléatoirement un élément de l et le déplace en tête de p : O(n), n taille de l *)
+
 let extraction_alea (l: 'a list) (p: 'a list) : 'a list * 'a list = 
   let len = List.length l in
   if len = 0 then (l, p)
@@ -20,6 +19,7 @@ let extraction_alea (l: 'a list) (p: 'a list) : 'a list * 'a list =
 
 
 (*** Q1.2 : Génère une liste d'entiers de 1 à n aléatoirement placés dans une liste (shuffle de Fisher-Yates) : O(n^2) *)
+
 let gen_permutation (n: int) : int list =
 
   (* Fonction pour générer la liste d'entier de 1 à n de manière récursive : O(n) *)
@@ -46,9 +46,8 @@ let gen_permutation (n: int) : int list =
     melange liste_base []
 
 
-(* --- Exercice 1.2 *)
+(*** Q1.4 : TODO *)
 
-(*** Q1.4 *)
 let intercale (l1: 'a list) (l2: 'a list) : 'a list =
   let rec intercale_rec l1 l2 n1 n2 =
     match (l1, l2) with
@@ -64,7 +63,8 @@ let intercale (l1: 'a list) (l2: 'a list) : 'a list =
   intercale_rec l1 l2 (List.length l1) (List.length l2)
 
 
-(*** Q1.5 *)
+(*** Q1.5 : TODO *)
+
 let rec gen_permutation2 (p: int) (q: int) : int list =
   if p > q then []
   else if p = q then [p]
@@ -72,8 +72,6 @@ let rec gen_permutation2 (p: int) (q: int) : int list =
     let moitie = (p + q) / 2 in
     intercale (gen_permutation2 p moitie) (gen_permutation2 (moitie + 1) q)
 
-
-(* --- Exercice 1.3 *)
 
 (*** Q1.7 : Création d'un ABR à partier d'une liste d'entiers *)
 
@@ -121,7 +119,8 @@ let creer_abr lst =
 (* -------------------- *)
 
 
-(*** Q2.8 : construction de la chaine de caractères liée à la structure de l'arbre (fonction "phi") *)
+(*** Q2.8 : Construction de la chaine de caractères liée à la structure de l'arbre (fonction "phi") *)
+
 let rec str_struct_abr (arbre: abr) : string =
   match arbre with
   | Feuille -> ""
@@ -129,7 +128,8 @@ let rec str_struct_abr (arbre: abr) : string =
     "(" ^ (str_struct_abr gauche) ^ ")" ^ (str_struct_abr droite)
 
 
-(*** Q2.9 : construction d'un tableau des étiquettes de l'arbre rangées en ordre préfixe *)
+(*** Q2.9 : Construction d'un tableau des étiquettes de l'arbre rangées en ordre préfixe *)
+
 let prefixe (arbre: abr) : int array =
   let rec prefixe_rec (arbre: abr) : int list =
     match arbre with 
@@ -140,9 +140,65 @@ let prefixe (arbre: abr) : int array =
   Array.of_list (prefixe_rec arbre)
 
 
+(*** Q2.10 : Compression d'un ABR en utilisant la méthode des pointeurs *)
+
+(*** Définition du type pour construire un ABR compressé *)
+
+type abr_comp = 
+  | Feuille_comp
+  | Noeud_comp of contenu_comp
+  | Pointeur_comp of pointeur_comp
+
+and contenu_comp = {
+  taille_c : int ;
+  label_c : int ;
+  gauche_c : abr_comp ;
+  droite_c : abr_comp ;
+}
+
+and pointeur_comp = {
+  cible_c : abr_comp ;
+  labels_c : int array ;
+}
+
+(*** Fonction pour rechercher une structure donnée dans un ABR *)
+
+let rec chercher_structure (arbre: abr) (structure: string) : abr =
+  match arbre with
+  | Feuille -> arbre
+  | Noeud {label ; gauche ; droite} ->
+    let struct_arbre = str_struct_abr arbre in
+    if struct_arbre = structure then
+      arbre
+    else
+      match chercher_structure gauche structure with
+      | Feuille -> chercher_structure droite structure
+      | result_gauche -> result_gauche
+
+(*** Fonction pour rechercher un noeud par label dans un ABR compressé (sans prendre en compte les poineurs) *)
+
+let rec chercher_label_comp (arbre: abr_comp) (lab: int) : abr_comp =
+  match arbre with
+  | Feuille_comp -> arbre
+  | Pointeur_comp _ -> Feuille_comp
+  | Noeud_comp {taille ; label ; gauche ; droite} ->
+    if label = lab then
+      arbre
+    else
+      match chercher_label_comp gauche lab with
+      | Feuille_comp -> chercher_label_comp droite lab
+      | result_gauche -> result_gauche
+
+(*** Fonction pour compresser un ABR :-) *)
+
+(* TODOOOOOO *)
+
+
+
 (* ----------------------------- *)
 (* --- Fonctions utilitaires --- *)
 (* ----------------------------- *)
+
 
 (* Afficher un abr dans le terminal (uniquement utile pour le debug) *)
 let rec afficher_abr (arbre: abr) : unit =
