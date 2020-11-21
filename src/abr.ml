@@ -243,6 +243,35 @@ let compresser_abr (src: abr) : abr_comp =
 
 (* TODOOOOOO *)
 
+let rec recherche_valeur_comp (arbre: abr_comp) (valeur: int) : bool =
+  match arbre with 
+  | Feuille_comp -> false
+  | Noeud_comp {taille_c ; label_c ; gauche_c ; droite_c} ->
+    if label_c = valeur then true
+    else if valeur > label_c then
+      recherche_valeur_comp droite_c valeur
+    else
+      recherche_valeur_comp gauche_c valeur
+
+  | Pointeur_comp {cible_c ; labels_c} ->
+    let rec parcours_labels (labels: int array) (i: int) : bool = (
+      if i >= Array.length labels_c then false
+      else if labels_c.(i) = valeur then true
+      else if labels_c.(i) < valeur then
+        parcours_labels labels (i + 1)
+      else (
+        match cible_c with
+        | Noeud_comp {taille_c ; label_c ; gauche_c ; droite_c} ->
+        (
+          match gauche_c with 
+          | Noeud_comp {taille_c ; label_c ; gauche_c ; droite_c} -> 
+            parcours_labels labels_c (i + 1 + taille_c)          
+          | _ -> false 
+        )
+        | _ -> false
+      )
+    ) in parcours_labels labels_c 0
+
 
 
 (* ----------------------------- *)
