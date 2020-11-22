@@ -214,9 +214,9 @@ let rec inserer_abr_comp (noeud: abr_comp) (arbre: abr_comp) : abr_comp =
       | Pointeur_comp _ -> arbre
       | Noeud_comp {taille_c = taille_a ; label_c = label_a ; gauche_c = gauche_a ; droite_c = droite_a} -> 
         if labels.(0) > label_a then
-          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = gauche_a ; droite_c = (inserer_abr_comp noeud droite_a)}
+          Noeud_comp {taille_c = (taille_a + (Array.length labels)) ; label_c = label_a ; gauche_c = gauche_a ; droite_c = (inserer_abr_comp noeud droite_a)}
         else
-          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = (inserer_abr_comp noeud gauche_a) ; droite_c = droite_a}
+          Noeud_comp {taille_c = (taille_a + (Array.length labels)) ; label_c = label_a ; gauche_c = (inserer_abr_comp noeud gauche_a) ; droite_c = droite_a}
     )
 
 (*** Fonction pour compresser un ABR :-) *)
@@ -229,17 +229,18 @@ let compresser_abr (src: abr) : abr_comp =
       let n_str = str_struct_abr noeud in
       match chercher_structure src n_str with
       | Noeud found ->
-        if found.label = n.label then
+        if found.label = n.label then 
           let new_comp = inserer_abr_comp (Noeud_comp {taille_c = 1 ; label_c = n.label ; gauche_c = Feuille_comp ; droite_c = Feuille_comp}) compresse in
           parcourir_arbre n.droite (parcourir_arbre n.gauche new_comp)
         else
-          let new_comp = inserer_abr_comp (Pointeur_comp {cible_c = (chercher_label_comp compresse found.label) ; labels_c = (prefixe noeud)}) compresse in
-          parcourir_arbre n.droite (parcourir_arbre n.gauche new_comp)
-      | Feuille _ -> Feuille_comp
+          inserer_abr_comp (Pointeur_comp {cible_c = (chercher_label_comp compresse found.label) ; labels_c = (prefixe noeud)}) compresse
+      | Feuille -> Feuille_comp
   in
 
   parcourir_arbre src Feuille_comp
 
+
+(*** Q2.11 : TODO *)
 
 let rec recherche_valeur_comp (arbre: abr_comp) (valeur: int) : bool =
   match arbre with 
