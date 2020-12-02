@@ -21,7 +21,6 @@ let extraction_alea (l: 'a list) (p: 'a list) : 'a list * 'a list =
 (*** Q1.2 : Génère une liste d'entiers de 1 à n aléatoirement placés dans une liste (shuffle de Fisher-Yates) : O(n^2) *)
 
 let gen_permutation (n: int) : int list =
-
   (* Fonction pour générer la liste d'entier de 1 à n de manière récursive : O(n) *)
   let rec gen_liste lst courant n = 
     if courant > n then
@@ -29,7 +28,6 @@ let gen_permutation (n: int) : int list =
     else
       gen_liste (courant :: lst) (courant + 1) n
   in
-
   (* Fonction pour insérer les éléments de src dans dst dans un ordre aléatoire : O(n^2), n taille de src *)
   let rec melange src dst = 
     match src with
@@ -38,7 +36,6 @@ let gen_permutation (n: int) : int list =
       let (srcp, dstp) = extraction_alea src dst in
       melange srcp dstp
   in
-
   if n < 1 then
     []
   else
@@ -46,7 +43,7 @@ let gen_permutation (n: int) : int list =
     melange liste_base []
 
 
-(*** Q1.4 : TODO *)
+(*** Q1.4 : Génère une liste intercalant les éléments de l1 et l2 de façon aléatoire *)
 
 let intercale (l1: 'a list) (l2: 'a list) : 'a list =
   let rec intercale_rec l1 l2 n1 n2 =
@@ -63,10 +60,11 @@ let intercale (l1: 'a list) (l2: 'a list) : 'a list =
   intercale_rec l1 l2 (List.length l1) (List.length l2)
 
 
-(*** Q1.5 : TODO *)
+(*** Q1.5 : Génère une liste des entiers de l'intervalle [p;q] permutés aléatoirement. p et q entiers naturels *)
 
 let rec gen_permutation2 (p: int) (q: int) : int list =
-  if p > q then []
+  if p < 0 || q < 0 then []
+  else if p > q then []
   else if p = q then [p]
   else
     let moitie = (p + q) / 2 in
@@ -189,7 +187,7 @@ let rec chercher_label_comp (arbre: abr_comp) (lab: int) : abr_comp =
     else 
       chercher_label_comp gc lab
 
-(*** Fonction pour insérer noaud dans un arbre compressé *)
+(*** Fonction pour insérer un noeud dans un arbre compressé *)
 
 let rec inserer_abr_comp (noeud: abr_comp) (arbre: abr_comp) : abr_comp =
   match noeud with
@@ -240,12 +238,12 @@ let compresser_abr (src: abr) : abr_comp =
   parcourir_arbre src Feuille_comp
 
 
-(*** Q2.11 : TODO *)
+(*** Q2.11 : Cherche si la valeur est présente dans l'arbre compressé et renvoie par conséquent true ou false *)
 
 let rec recherche_valeur_comp (arbre: abr_comp) (valeur: int) : bool =
   match arbre with 
   | Feuille_comp -> false
-  | Noeud_comp {taille_c ; label_c ; gauche_c ; droite_c} ->
+  | Noeud_comp {taille_c = _ ; label_c ; gauche_c ; droite_c} ->
     if label_c = valeur then true
     else if valeur > label_c then
       recherche_valeur_comp droite_c valeur
@@ -253,23 +251,36 @@ let rec recherche_valeur_comp (arbre: abr_comp) (valeur: int) : bool =
       recherche_valeur_comp gauche_c valeur
 
   | Pointeur_comp {cible_c ; labels_c} ->
-    let rec parcours_labels (labels: int array) (i: int) : bool = (
-      if i >= Array.length labels_c then false
-      else if labels_c.(i) = valeur then true
-      else if labels_c.(i) < valeur then
-        parcours_labels labels (i + 1)
-      else (
-        match cible_c with
-        | Noeud_comp {taille_c ; label_c ; gauche_c ; droite_c} ->
-        (
-          match gauche_c with 
-          | Noeud_comp {taille_c ; label_c ; gauche_c ; droite_c} -> 
-            parcours_labels labels_c (i + 1 + taille_c)          
-          | _ -> false 
+    let rec parcours_labels (cible: abr_comp) (labels: int array) (i: int) : bool = (
+      if i >= Array.length labels then false
+      else if valeur = labels.(i) then true
+      else if valeur < labels.(i) then (
+        (* on veut aller à gauche *)
+        match cible with
+          | Noeud_comp {taille_c = _ ; label_c = _ ; gauche_c  = gc ; droite_c = _} ->
+            parcours_labels gc labels (i + 1)
+          | _ -> false
+      ) else ( 
+        (* on veut aller à droite : nécessite saut dans le tableau *)
+        match cible with
+        (* cast de la cible pour avoir accès ses fils *)
+        | Noeud_comp {taille_c = _ ; label_c = _ ; gauche_c = gc ; droite_c = dc} -> (
+          (* calcul de la taille du fils gauche pour aller au fils droit dans le tableau *)
+          match gc with
+          | Noeud_comp {taille_c = tc_f ; label_c = _ ; gauche_c = _ ; droite_c = _} ->
+            parcours_labels dc labels (i + 1 + tc_f)
+          | Pointeur_comp {cible_c = cc_f ; labels_c = _} -> (
+            match cc_f with
+            | Noeud_comp {taille_c = tc_fc ; label_c = _ ; gauche_c = _ ; droite_c = _} ->
+              parcours_labels dc labels (i + 1 + tc_fc)
+            | _ -> false
+          )
+          | Feuille_comp -> parcours_labels dc labels (i + 1)
         )
         | _ -> false
       )
-    ) in parcours_labels labels_c 0
+    )
+    in parcours_labels cible_c labels_c 0
 
 
 
@@ -278,7 +289,7 @@ let rec recherche_valeur_comp (arbre: abr_comp) (valeur: int) : bool =
 (* ----------------------------- *)
 
 
-(* Afficher un abr dans le terminal (uniquement utile pour le debug) *)
+(* Afficher un abr dans le terminal (utile pour le debug) *)
 let rec afficher_abr (arbre: abr) : unit =
   match arbre with
   | Feuille -> print_string "x" ; ()
