@@ -92,11 +92,11 @@ let rec inserer_abr (noeud: abr) (arbre: abr) : abr =
     | Noeud nv ->
       match arbre with
       | Feuille -> noeud
-      | Noeud {label ; gauche ; droite} -> 
-        if nv.label > label then
-          Noeud {label = label ; gauche = gauche ; droite = (inserer_abr noeud droite)}
+      | Noeud prochain -> 
+        if nv.label > prochain.label then
+          Noeud {label = prochain.label ; gauche = prochain.gauche ; droite = (inserer_abr noeud prochain.droite)}
         else
-          Noeud {label = label ; gauche = (inserer_abr noeud gauche) ; droite = droite}
+          Noeud {label = prochain.label ; gauche = (inserer_abr noeud prochain.gauche) ; droite = prochain.droite}
 
 
 (* Fonction de construction d'un ABR à partir d'une liste d'entiers *)
@@ -122,8 +122,8 @@ let creer_abr lst =
 let rec str_struct_abr (arbre: abr) : string =
   match arbre with
   | Feuille -> ""
-  | Noeud {label ; gauche ; droite} ->
-    "(" ^ (str_struct_abr gauche) ^ ")" ^ (str_struct_abr droite)
+  | Noeud n ->
+    "(" ^ (str_struct_abr n.gauche) ^ ")" ^ (str_struct_abr n.droite)
 
 
 (*** Q2.9 : Construction d'un tableau des étiquettes de l'arbre rangées en ordre préfixe *)
@@ -132,8 +132,8 @@ let prefixe (arbre: abr) : int array =
   let rec prefixe_rec (arbre: abr) : int list =
     match arbre with 
     | Feuille -> []
-    | Noeud {label ; gauche ; droite} ->
-      label::(prefixe_rec gauche) @ (prefixe_rec droite)
+    | Noeud n ->
+      n.label::(prefixe_rec n.gauche) @ (prefixe_rec n.droite)
   in
   Array.of_list (prefixe_rec arbre)
 
@@ -164,13 +164,13 @@ and pointeur_comp = {
 let rec chercher_structure (arbre: abr) (structure: string) : abr =
   match arbre with
   | Feuille -> arbre
-  | Noeud {label ; gauche ; droite} ->
+  | Noeud n ->
     let struct_arbre = str_struct_abr arbre in
     if struct_arbre = structure then
       arbre
     else
-      match chercher_structure gauche structure with
-      | Feuille -> chercher_structure droite structure
+      match chercher_structure n.gauche structure with
+      | Feuille -> chercher_structure n.droite structure
       | result_gauche -> result_gauche
 
 (*** Fonction pour rechercher un noeud par label dans un ABR compressé (sans prendre en compte les pointeurs) *)
@@ -179,13 +179,13 @@ let rec chercher_label_comp (arbre: abr_comp) (lab: int) : abr_comp =
   match arbre with
   | Feuille_comp -> arbre
   | Pointeur_comp _ -> Feuille_comp
-  | Noeud_comp {taille_c = _ ; label_c = lc ; gauche_c = gc ; droite_c = dc} ->
-    if lc = lab then
+  | Noeud_comp n ->
+    if n.label_c = lab then
       arbre
-    else if lab > lc then 
-      chercher_label_comp dc lab 
+    else if lab > n.label_c then 
+      chercher_label_comp n.droite_c lab 
     else 
-      chercher_label_comp gc lab
+      chercher_label_comp n.gauche_c lab
 
 (*** Fonction pour insérer un noeud dans un arbre compressé *)
 
@@ -193,28 +193,26 @@ let rec inserer_abr_comp (noeud: abr_comp) (arbre: abr_comp) : abr_comp =
   match noeud with
   | Feuille_comp -> arbre
 
-  | Noeud_comp {taille_c = taille ; label_c = label ; gauche_c = gauche ; droite_c = droite} ->
-    (
+  | Noeud_comp n -> (
       match arbre with
       | Feuille_comp -> noeud
       | Pointeur_comp _ -> arbre
-      | Noeud_comp {taille_c = taille_a ; label_c = label_a ; gauche_c = gauche_a ; droite_c = droite_a} -> 
-        if label > label_a then
-          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = gauche_a ; droite_c = (inserer_abr_comp noeud droite_a)}
+      | Noeud_comp n_a -> 
+        if n.label_c > n_a.label_c then
+          Noeud_comp {taille_c = (n_a.taille_c + 1) ; label_c = n_a.label_c ; gauche_c = n_a.gauche_c ; droite_c = (inserer_abr_comp noeud n_a.droite_c)}
         else
-          Noeud_comp {taille_c = (taille_a + 1) ; label_c = label_a ; gauche_c = (inserer_abr_comp noeud gauche_a) ; droite_c = droite_a}
+          Noeud_comp {taille_c = (n_a.taille_c + 1) ; label_c = n_a.label_c ; gauche_c = (inserer_abr_comp noeud n_a.gauche_c) ; droite_c = n_a.droite_c}
     )
 
-  | Pointeur_comp {cible_c = cible ; labels_c = labels} ->
-    (
+  | Pointeur_comp p -> (
       match arbre with
       | Feuille_comp -> noeud
       | Pointeur_comp _ -> arbre
-      | Noeud_comp {taille_c = taille_a ; label_c = label_a ; gauche_c = gauche_a ; droite_c = droite_a} -> 
-        if labels.(0) > label_a then
-          Noeud_comp {taille_c = (taille_a + (Array.length labels)) ; label_c = label_a ; gauche_c = gauche_a ; droite_c = (inserer_abr_comp noeud droite_a)}
+      | Noeud_comp n_a -> 
+        if p.labels_c.(0) > n_a.label_c then
+          Noeud_comp {taille_c = (n_a.taille_c + (Array.length p.labels_c)) ; label_c = n_a.label_c ; gauche_c = n_a.gauche_c ; droite_c = (inserer_abr_comp noeud n_a.droite_c)}
         else
-          Noeud_comp {taille_c = (taille_a + (Array.length labels)) ; label_c = label_a ; gauche_c = (inserer_abr_comp noeud gauche_a) ; droite_c = droite_a}
+          Noeud_comp {taille_c = (n_a.taille_c + (Array.length p.labels_c)) ; label_c = n_a.label_c ; gauche_c = (inserer_abr_comp noeud n_a.gauche_c) ; droite_c = n_a.droite_c}
     )
 
 (*** Fonction pour compresser un ABR :-) *)
@@ -249,40 +247,43 @@ let rec recherche_valeur_comp (arbre: abr_comp) (valeur: int) : bool =
       recherche_valeur_comp droite_c valeur
     else
       recherche_valeur_comp gauche_c valeur
-
   | Pointeur_comp {cible_c ; labels_c} ->
+    (* il faut parcourir intelligemment son tableau *)
     let rec parcours_labels (cible: abr_comp) (labels: int array) (i: int) : bool = (
       if i >= Array.length labels then false
       else if valeur = labels.(i) then true
       else if valeur < labels.(i) then (
         (* on veut aller à gauche *)
         match cible with
-          | Noeud_comp {taille_c = _ ; label_c = _ ; gauche_c  = gc ; droite_c = _} ->
-            parcours_labels gc labels (i + 1)
+          | Noeud_comp noeud_cible ->
+            parcours_labels noeud_cible.gauche_c labels (i + 1)
           | _ -> false
       ) else ( 
         (* on veut aller à droite : nécessite saut dans le tableau *)
         match cible with
-        (* cast de la cible pour avoir accès ses fils *)
-        | Noeud_comp {taille_c = _ ; label_c = _ ; gauche_c = gc ; droite_c = dc} -> (
-          (* calcul de la taille du fils gauche pour aller au fils droit dans le tableau *)
-          match gc with
-          | Noeud_comp {taille_c = tc_f ; label_c = _ ; gauche_c = _ ; droite_c = _} ->
-            parcours_labels dc labels (i + 1 + tc_f)
-          | Pointeur_comp {cible_c = cc_f ; labels_c = _} -> (
-            match cc_f with
-            | Noeud_comp {taille_c = tc_fc ; label_c = _ ; gauche_c = _ ; droite_c = _} ->
-              parcours_labels dc labels (i + 1 + tc_fc)
-            | _ -> false
+          (* cast de la cible (forcément un noeud) pour avoir accès ses fils *)
+          | Noeud_comp noeud_cible -> (
+            (* calcul de la taille du fils gauche pour aller au fils droit dans le tableau *)
+            match noeud_cible.gauche_c with
+            | Noeud_comp gauche_cible ->
+              parcours_labels noeud_cible.droite_c labels (i + 1 + gauche_cible.taille_c)
+            | Pointeur_comp gauche_cible ->
+              parcours_labels noeud_cible.droite_c labels (i + 1 + (Array.length gauche_cible.labels_c))
+            | Feuille_comp -> 
+              parcours_labels noeud_cible.droite_c labels (i + 1)
           )
-          | Feuille_comp -> parcours_labels dc labels (i + 1)
-        )
-        | _ -> false
+          | _ -> false
       )
     )
     in parcours_labels cible_c labels_c 0
 
 
+
+(* -------------------- *)
+(* ----- Partie 3 ----- *)
+(* -------------------- *)
+
+(* TODO *)
 
 (* ----------------------------- *)
 (* --- Fonctions utilitaires --- *)

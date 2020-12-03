@@ -2,7 +2,7 @@ open Abr
 
 (** Données *)
 
-(* a1 : Arbre de la question 1.7 du sujet *)
+(* a1 : ABR de la question 1.7 du sujet *)
 
     let a1_n1 = Noeud {label = 1 ; gauche = Feuille ; droite = Feuille} ;;
     let a1_n3 = Noeud {label = 3 ; gauche = Feuille ; droite = Feuille} ;;
@@ -31,7 +31,7 @@ let a1_n4_c = Noeud_comp {taille_c = 9 ; label_c = 4 ; gauche_c = a1_n2_c ; droi
 let a1_comp = a1_n4_c ;;
 
 
-(* a2 : Arbre plus complet, visuel à retrouver dans le rapport *)
+(* a2 : ABR plus complet, visuels à retrouver dans le rapport *)
 
         let a2_n2 = Noeud {label = 2 ; gauche = Feuille ; droite = Feuille} ;;
       let a2_n1 = Noeud {label = 1 ; gauche = Feuille ; droite = a2_n2} ;;
@@ -55,7 +55,9 @@ let a2_n13 = Noeud {label = 13 ; gauche = a2_n7 ; droite = a2_n16} ;;
 
 let a2 = a2_n13 ;;
 
-let a2_prefixe = [|13;7;3;1;2;5;4;6;9;8;1;10;12;16;14;15;18;17;19|] ;;
+let a2_str = "(((()())(())())(())(())())(()())(())()" ;;
+
+let a2_prefixe = [|13;7;3;1;2;5;4;6;9;8;11;10;12;16;14;15;18;17;19|] ;;
 
         let a2_n2_c = Noeud_comp {taille_c = 1 ; label_c = 2 ; gauche_c = Feuille_comp ; droite_c = Feuille_comp} ;;
       let a2_n1_c = Noeud_comp {taille_c = 2 ; label_c = 1 ; gauche_c = Feuille_comp ; droite_c = a2_n2_c} ;;
@@ -193,23 +195,25 @@ let test_creer_abr () =
   assert (creer_abr [2;1;3] = a1_n2) ;
   assert (creer_abr [4;2;3;8;1;9;6;5;7] = a1) ;
   assert (creer_abr [4;2;1;8;3;9;6;7;5] = a1) ;
+  assert (creer_abr [7;3;9;1;5;8;11;2;4;6;10;12] = a2_n7) ;
   assert (creer_abr [13;7;16;3;9;14;18;1;5;8;11;15;17;19;2;4;6;10;12] = a2) ;
+  assert (creer_abr [13;7;16;3;9;14;18;5;1;8;11;15;17;19;2;4;6;12;10] = a2) ;
   ()
 
 
 let test_str_struct_abr () =
-  let str = str_struct_abr a1 in
-  assert (str = a1_str) ;
   assert (str_struct_abr Feuille = "") ;
   assert (str_struct_abr a1_n1 = "()" ) ;
   assert (str_struct_abr a1_n2 = "(())()" ) ;
+  assert (str_struct_abr a1 = a1_str) ;
+  assert (str_struct_abr a2 = a2_str) ;
   ()
 
 
 let test_prefixe () =
-  let pref = prefixe a1 in
-  assert (pref = a1_prefixe) ;
-  assert (prefixe Feuille = Array.make 0 0) ;
+  assert (prefixe a1 = a1_prefixe) ;
+  assert (prefixe a2 = a2_prefixe) ;
+  assert (prefixe Feuille = [||]) ;
   assert (prefixe a1_n2 = [|2;1;3|]) ;
   assert (prefixe a1_n1 = [|1|]) ;
   assert (prefixe a1_n3 = [|3|]) ;
@@ -219,8 +223,13 @@ let test_prefixe () =
   ()
 
 let test_chercher_structure () = 
+  assert (chercher_structure a1 a1_str = a1) ;
+  assert (chercher_structure a2 a2_str = a2) ;
   assert (chercher_structure a1 (str_struct_abr a1_n6) = a1_n2) ;
   assert (chercher_structure a1 (str_struct_abr a1_n9) = a1_n1) ;
+  assert (chercher_structure a2 (str_struct_abr a2_n16) = a2_n3) ;
+  assert (chercher_structure a2 (str_struct_abr a2_n11) = a2_n5) ;
+  assert (chercher_structure a2 (str_struct_abr a2_n8) = a2_n2) ;
   assert (chercher_structure a1 "(()(((" = Feuille) ;
   assert (chercher_structure Feuille "(()(" = Feuille) ;
   assert (chercher_structure Feuille "" = Feuille) ;
@@ -251,9 +260,28 @@ let test_recherche_valeur_comp () =
   assert (recherche_valeur_comp a1_comp 10 = false) ;
   assert (recherche_valeur_comp a1_comp 11 = false) ;
   (* a2_comp *)
-  
+  assert (recherche_valeur_comp a2_comp 1 = true) ;
+  assert (recherche_valeur_comp a2_comp 2 = true) ;
+  assert (recherche_valeur_comp a2_comp 3 = true) ;
+  assert (recherche_valeur_comp a2_comp 4 = true) ;
+  assert (recherche_valeur_comp a2_comp 5 = true) ;
+  assert (recherche_valeur_comp a2_comp 6 = true) ;
+  assert (recherche_valeur_comp a2_comp 7 = true) ;
+  assert (recherche_valeur_comp a2_comp 8 = true) ;
+  assert (recherche_valeur_comp a2_comp 9 = true) ;
+  assert (recherche_valeur_comp a2_comp 10 = true) ;
+  assert (recherche_valeur_comp a2_comp 11 = true) ;
+  assert (recherche_valeur_comp a2_comp 12 = true) ;
+  assert (recherche_valeur_comp a2_comp 13 = true) ;
+  assert (recherche_valeur_comp a2_comp 14 = true) ;
   assert (recherche_valeur_comp a2_comp 15 = true) ;
-  
+  assert (recherche_valeur_comp a2_comp 16 = true) ;
+  assert (recherche_valeur_comp a2_comp 17 = true) ;
+  assert (recherche_valeur_comp a2_comp 18 = true) ;
+  assert (recherche_valeur_comp a2_comp 19 = true) ;
+  assert (recherche_valeur_comp a2_comp 0 = false) ;
+  assert (recherche_valeur_comp a2_comp 20 = false) ;
+  assert (recherche_valeur_comp a2_comp 21 = false) ;
   ()
 
 
