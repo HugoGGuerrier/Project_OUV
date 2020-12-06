@@ -331,6 +331,7 @@ let chrono fonction arg1 arg2 : float =
 (* Fonction pour récupérer la taille de l'espace mémoire occupé par une structure *)
 let sizeof (x: 'a) : int = Obj.reachable_words (Obj.repr x)
 
+
 (* ----------------------------- *)
 (* --- Fonctions utilitaires --- *)
 (* ----------------------------- *)

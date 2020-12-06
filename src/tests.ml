@@ -346,7 +346,7 @@ let run_tests () =
       ("Q2.10 - Recherche d'une structure dans un ABR", test_chercher_structure) ;
       ("Q2.10 - Compression d'un ABR", test_compresser_abr) ;
       ("Q2.11 - Présence d'une valeur dans un ABR compressé", test_recherche_valeur_comp) ;
-      ("Q3.14 - Etude de la complexité en temps des fonctions de recherche dans un ABR et de leur taille", etude_recherche) ;
+      ("Q3.14/15 - Etude de la complexité en temps des fonctions de recherche dans un ABR et de leur taille", etude_recherche) ;
     ]
   in
   List.iteri
