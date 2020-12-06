@@ -19,12 +19,16 @@ Cette réponse vient du fait que la fonction récursive `melange` est la seule �
 
 
 ### Q1.6
-complexité de gen_permutation2
+La complexité de la fonction `gen_permutation2` en nombre d'appels au générateur de nombre aléatoires est en O(n²) au pire cas. On peut justifier cette complexité par le fait qu'on appelle la fonction `intercale` de manière récusive sur chaque partie de la liste. Cette fonction qui dans le pire cas appelle n fois le générateur de nombre aléatoires.
+
+La complexité de la fonction `gen_permutation2` en nombre d'appels à la structure `match ... with` est en O(n²) pour les mêmes raison que l'appel au générateur de nombres aléatoires
 
 ## Exercice 2
 
 ### Q2.11
-complexité pire cas (tout à droite de l'arbre et considérer la hauteur de l'arbre)
+La complexité en pire cas de la recherche dans un ABR compressé (fonction `recherche_valeur_comp`) est la recherche d'une valeur qui n'est pas dans l'ABR, et que cet ABR n'est pas équilibré, par exemple avec toutes ses valeurs systématiquement en fils gauche (arbre pouvant être créé à partir d'un tableau d'entiers trié en ordre décroissant). Ainsi, la fonction va parcourir les n noeuds qui composent l'ABR avant de retourner qu'il n'a rien trouvé.
+La complexité du pire cas est donc en O(n).
+Tous les autres parcours de l'ABR ont cette complexité ou moins.
 
 Nous sommes beaucoup revenus sur la fonction `recherche_valeur_comp`.
 Premièrement car tous les tests avec a1_comp ne passaient pas, puis nous avons augmenté nos jeux de tests pour s'assurer que tout fonctionne bien avec des arbres plus complexes comme a2_comp. Cela a levé de nouvelles erreurs qui nous ont permis de corriger complètement notre fonction et d'être sûrs de son bon fonctionnement.
@@ -48,6 +52,9 @@ match cible with
 
 ### Q2.12 (facultative)
 
+Il est vrai que la complexité la plus intéressante à trouver est celle en moyenne, plus que celle dans le pire cas.
+Mais nous ne savons pas calculer la complexité en moyenne. A vue d'oeil, nous dirions O(log(n)).
+
 
 
 ## Exercice 3
@@ -55,9 +62,8 @@ match cible with
 ### Q3.13
 TODO
 
-### Q2.14/15
+### Q3.14/15
 TODO graphes etc
-
 
 
 

@@ -285,6 +285,53 @@ let test_recherche_valeur_comp () =
   ()
 
 
+let size_list = [10; 50; 100; 200; 500; 1000; 2500; 5000; 7500; 10000] ;;
+let nb_recherche = 20000
+
+(** Fonction pour étudier le temps des fonctions de recherche *)
+let etude_recherche () =
+  let rec recherche_normal_rec (arbre: abr) (taille: int) (cpt: int) : unit =
+    if cpt <= 0 then ()
+    else (
+      let valeur = (Random.int taille) + 1 in
+      let _ = recherche_valeur arbre valeur in
+      recherche_normal_rec arbre taille (cpt - 1)
+    )
+  in
+
+  let rec recherche_comp_rec (arbre: abr_comp) (taille: int) (cpt: int) : unit =
+    if cpt <= 0 then ()
+    else (
+      let valeur = (Random.int taille) + 1 in
+      let _ = recherche_valeur_comp arbre valeur in
+      recherche_comp_rec arbre taille (cpt - 1)
+    )
+  in
+
+  print_newline () ;
+  Format.printf "\027[1m Nb Noeuds\027[0m\t|\027[1m Tmps. comp.\027[0m\t|\027[1m %d Rech.\027[0m\t|\027[1m %d Rech. comp.\027[0m\t|\027[1m Taille\027[0m\t|\027[1m Taille comp.\027[0m\n" nb_recherche nb_recherche ;
+  List.iter (
+    fun size ->
+      Format.printf " %d\t\t|" size ;
+      let arbre = creer_abr (gen_permutation size) in
+
+      let start_c = Sys.time () in
+      let arbre_comp = compresser_abr arbre in
+      let comp_time = Sys.time () -. start_c in
+
+      let start_standard = Sys.time () in
+      recherche_normal_rec arbre size nb_recherche ;
+      let temps = Sys.time () -. start_standard in
+
+      let start_comp = Sys.time () in
+      recherche_comp_rec arbre_comp size nb_recherche ;
+      let temps_comp = Sys.time () -. start_comp in
+      
+      Format.printf " %fs\t| %fs\t| %fs\t\t| %d\t\t| %d\n" comp_time temps temps_comp (sizeof arbre) (sizeof arbre_comp) ;
+  ) size_list ;
+  ()
+
+
 (** Lancement et formatage des tests *)
 
 let run_tests () =
@@ -299,6 +346,7 @@ let run_tests () =
       ("Q2.10 - Recherche d'une structure dans un ABR", test_chercher_structure) ;
       ("Q2.10 - Compression d'un ABR", test_compresser_abr) ;
       ("Q2.11 - Présence d'une valeur dans un ABR compressé", test_recherche_valeur_comp) ;
+      ("Q3.14 - Etude de la complexité en temps des fonctions de recherche dans un ABR et de leur taille", etude_recherche) ;
     ]
   in
   List.iteri
@@ -308,8 +356,8 @@ let run_tests () =
         f_test () ;
         Format.printf "\027[32mOK\n\027[39m"
       with exn ->
-        Format.printf "\027[31mErreur - %s\n\027[39m" (Printexc.to_string exn))
-    liste_tests
+        Format.printf "\027[31mErreur - %s\n\027[39m" (Printexc.to_string exn)
+    ) liste_tests
     
 
 (* Main *)
