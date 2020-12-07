@@ -2,3 +2,6 @@
 
 * Authors : Emilie Siau (3700323), Hugo Guerrier (3970839)
 * License : MIT
+
+Lancer les tests : make test
+Nettoyer les fichiers : make clean
