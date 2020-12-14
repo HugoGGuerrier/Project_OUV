@@ -167,7 +167,6 @@ let prefixe (arbre: abr) : int array =
 (* ===== Q2.10 : Compression d'un ABR en utilisant la méthode des pointeurs ===== *)
 
 (* Définition du type pour construire un ABR compressé *)
-
 type abr_comp = 
   | Feuille_comp
   | Noeud_comp of contenu_comp
@@ -242,7 +241,6 @@ let rec inserer_abr_comp (noeud: abr_comp) (arbre: abr_comp) : abr_comp =
     )
 
 (* Fonction pour compresser un ABR :-) *)
-
 let compresser_abr (src: abr) : abr_comp = 
   let rec parcourir_arbre (noeud: abr) (compresse: abr_comp) : abr_comp = 
     match noeud with

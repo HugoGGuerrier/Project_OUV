@@ -285,7 +285,7 @@ let test_recherche_valeur_comp () =
   ()
 
 
-let size_list = [10; 50; 100; 200; 500; 1000; 2500; 5000; 7500; 10000] ;;
+let size_list = [10; 50; 100; 200; 500; 1000; 2500; 5000; 7500; 10000; 12500; 15000; 17500; 20000] ;;
 let nb_recherche = 20000
 
 (** Fonction pour étudier le temps des fonctions de recherche *)
