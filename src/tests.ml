@@ -285,8 +285,8 @@ let test_recherche_valeur_comp () =
   ()
 
 
-let size_list = [10; 50; 100; 200; 500; 1000; 2500; 5000; 7500; 10000; 12500; 15000; 17500; 20000] ;;
-let nb_recherche = 20000
+let size_list = [10; 50; 100; 200; 500; 1000; 2500; 5000; 7500; 10000] ;;
+let nb_recherches = 20000
 
 (** Fonction pour étudier le temps des fonctions de recherche *)
 let etude_recherche () =
@@ -309,7 +309,7 @@ let etude_recherche () =
   in
 
   print_newline () ;
-  Format.printf "\027[1m Nb Noeuds\027[0m\t|\027[1m Tmps. comp.\027[0m\t|\027[1m %d Rech.\027[0m\t|\027[1m %d Rech. comp.\027[0m\t|\027[1m Taille\027[0m\t|\027[1m Taille comp.\027[0m\n" nb_recherche nb_recherche ;
+  Format.printf "\027[1m Nb Noeuds\027[0m\t|\027[1m Tmps. comp.\027[0m\t|\027[1m %d Rech.\027[0m\t|\027[1m %d Rech. comp.\027[0m\t|\027[1m Taille\027[0m\t|\027[1m Taille comp.\027[0m\n" nb_recherches nb_recherches ;
   List.iter (
     fun size ->
       Format.printf " %d\t\t|" size ;
@@ -320,11 +320,11 @@ let etude_recherche () =
       let comp_time = Sys.time () -. start_c in
 
       let start_standard = Sys.time () in
-      recherche_normal_rec arbre size nb_recherche ;
+      recherche_normal_rec arbre size nb_recherches ;
       let temps = Sys.time () -. start_standard in
 
       let start_comp = Sys.time () in
-      recherche_comp_rec arbre_comp size nb_recherche ;
+      recherche_comp_rec arbre_comp size nb_recherches ;
       let temps_comp = Sys.time () -. start_comp in
       
       Format.printf " %fs\t| %fs\t| %fs\t\t| %d\t\t| %d\n" comp_time temps temps_comp (sizeof arbre) (sizeof arbre_comp) ;

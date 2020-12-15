@@ -50,7 +50,7 @@ let gen_permutation (n: int) : int list =
 (* ===== Q1.4 : Génère une liste intercalant les éléments de l1 et l2 de façon aléatoire ===== *)
 
 let intercale (l1: 'a list) (l2: 'a list) : 'a list =
-  let rec intercale_rec l1 l2 n1 n2 =
+  let rec intercale_rec (l1: 'a list) (l2: 'a list) (n1: int) (n2: int) =
     match (l1, l2) with
     | ([], _) -> l2
     | (_, []) -> l1
